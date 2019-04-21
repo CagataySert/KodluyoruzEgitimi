@@ -4,6 +4,7 @@ import Input from './components/Input';
 import Header from './components/Header';
 import Button from './components/Button';
 import AttachedList from './components/AttachedList';
+import { AsyncStorage } from 'react-native';
 
 export default class App extends Component {
 
@@ -13,6 +14,37 @@ export default class App extends Component {
     attachedList: []
   }
 
+  componentDidMount() {
+    //response comes back as promise from local storage.
+    const response = this._retrieveData();
+    const attachedList = response.then((data) => {
+      this.setState({ attachedList: data });
+    });
+  }
+
+  //Store data to Local of phone.
+  _storeData = async (data) => {
+    try {
+      strData = JSON.stringify(data);
+
+      await AsyncStorage.setItem('za11', strData);
+    }
+    catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  //Retrieve data from the local storage.
+  _retrieveData = async () => {
+    let response;
+    try {
+      response = await AsyncStorage.getItem('za11') || 'none';
+    }
+    catch (error) {
+      console.log(error.message);
+    }
+    return JSON.parse(response);
+  };
 
   handleTextChange = (type, value) => {
     type === 'title' ? this.state.title = value : this.state.description = value;
@@ -21,9 +53,9 @@ export default class App extends Component {
   handleAddButton = async () => {
     await this.setState({
       attachedList: [...this.state.attachedList, { 'title': this.state.title, 'description': this.state.description }]
-    });
-    console.log(this.state);
+    })
 
+    await this._storeData(this.state.attachedList);
   }
 
   render() {
