@@ -1,9 +1,11 @@
 import React from 'react'
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 
+
 const Button = (props) => {
+
     return (
-        <TouchableOpacity activeOpacity={0.7} style={[styles.button, { backgroundColor: props.renk }]}>
+        <TouchableOpacity onPress={props.handleAddButton} activeOpacity={0.7} style={[styles.button, { backgroundColor: props.color }]}>
             <Text style={{ color: 'white' }}>{props.text}</Text>
         </TouchableOpacity>
     )

@@ -5,32 +5,28 @@ const { width } = Dimensions.get('window');
 
 
 class AttachedList extends Component {
+
+
+
+
     render() {
         return (
             <FlatList
                 contentContainerStyle={{ alignItems: 'center' }}
-                data={[
-                    {
-                        title: 'Hediye Al',
-                        description: 'Ali"ye hediye almayı unutma!!!'
-                    },
-                    {
-                        key: 'basdasasd'
-                    }]
-                }
+                data={this.props.attachedList}
                 renderItem={({ item }) =>
                     <View style={styles.attachedBox}>
                         <Text style={styles.title}>{item.title}</Text>
                         <Text style={styles.description}>{item.description}</Text>
                     </View>}
-                style={styles.attachedList}
+                style={styles.attachedListRegion}
             />
         )
     }
 }
 
 const styles = StyleSheet.create({
-    attachedList: {
+    attachedListRegion: {
         width,
         marginTop: 20,
     },

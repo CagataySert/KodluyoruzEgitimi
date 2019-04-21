@@ -6,20 +6,40 @@ import Button from './components/Button';
 import AttachedList from './components/AttachedList';
 
 export default class App extends Component {
+
+  state = {
+    title: '',
+    description: '',
+    attachedList: []
+  }
+
+
+  handleTextChange = (type, value) => {
+    type === 'title' ? this.state.title = value : this.state.description = value;
+  }
+
+  handleAddButton = async () => {
+    await this.setState({
+      attachedList: [...this.state.attachedList, { 'title': this.state.title, 'description': this.state.description }]
+    });
+    console.log(this.state);
+
+  }
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
         <Header />
 
         <Text style={{ color: 'white', marginBottom: 5 }}>Title</Text>
-        <Input inputHeight={40} />
+        <Input handleTextChange={this.handleTextChange} type='title' inputHeight={40} />
 
         <Text style={{ color: 'white', marginTop: 10, marginBottom: 5 }}>Description</Text>
-        <Input inputHeight={80} />
+        <Input handleTextChange={this.handleTextChange} type='decription' inputHeight={80} />
 
-        <Button renk={'#183661'} text={'Add'} />
+        <Button handleAddButton={this.handleAddButton} color={'#183661'} text={'Add'} />
 
-        <AttachedList />
+        <AttachedList attachedList={this.state.attachedList} />
       </SafeAreaView >
     );
   }

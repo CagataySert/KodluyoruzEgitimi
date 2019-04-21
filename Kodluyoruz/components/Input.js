@@ -7,18 +7,20 @@ import {
 const { width } = Dimensions.get('window');
 
 class Input extends Component {
-    constructor(props) {
-        super(props);
-        this.state = { text: 'Usseless' };
-        console.log(props.inputHeight);
+    state = {
+        text: ''
+    };
 
+    handleTextChange = (text) => {
+        this.setState({ text });
+        this.props.handleTextChange(this.props.type, text);
     }
 
     render() {
         return (
             <TextInput
                 style={[styles.input, { height: this.props.inputHeight }]}
-                onChangeText={(text) => this.setState({ text })}
+                onChangeText={(text) => this.handleTextChange(text)}
                 value={this.state.text}
             />
         );
