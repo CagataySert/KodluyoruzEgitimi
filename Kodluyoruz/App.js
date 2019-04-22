@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, SafeAreaView } from 'react-native';
-import Input from './components/Input';
+import { View, Text, TextInput, SafeAreaView } from 'react-native';
 import Header from './components/Header';
 import Button from './components/Button';
 import AttachedList from './components/AttachedList';
 import { AsyncStorage } from 'react-native';
+import styles from './styles/formStyle';
 
 export default class App extends Component {
 
@@ -17,7 +17,7 @@ export default class App extends Component {
   componentDidMount() {
     //response comes back as promise from local storage.
     const response = this._retrieveData();
-    const attachedList = response.then((data) => {
+    response.then((data) => {
       this.setState({ attachedList: data });
     });
   }
@@ -47,15 +47,17 @@ export default class App extends Component {
   };
 
   handleTextChange = (type, value) => {
-    type === 'title' ? this.state.title = value : this.state.description = value;
+    type === 'title' ? this.setState({ title: value }) : this.setState({ description: value });
   }
 
   handleAddButton = async () => {
+    attachedList = [...this.state.attachedList, { 'title': this.state.title, 'description': this.state.description }];
     await this.setState({
-      attachedList: [...this.state.attachedList, { 'title': this.state.title, 'description': this.state.description }]
-    })
-
-    await this._storeData(this.state.attachedList);
+      title: '',
+      description: '',
+      attachedList
+    });
+    this._storeData(attachedList);
   }
 
   render() {
@@ -64,10 +66,21 @@ export default class App extends Component {
         <Header />
 
         <Text style={{ color: 'white', marginBottom: 5 }}>Title</Text>
-        <Input handleTextChange={this.handleTextChange} type='title' inputHeight={40} />
+        <TextInput
+          maxLength={20}
+          style={[styles.input, { height: 40 }]}
+          onChangeText={(text) => this.handleTextChange('title', text)}
+          value={this.state.title}
+        />
 
         <Text style={{ color: 'white', marginTop: 10, marginBottom: 5 }}>Description</Text>
-        <Input handleTextChange={this.handleTextChange} type='decription' inputHeight={80} />
+        <TextInput
+          maxLength={200}
+          multiline={true}
+          style={[styles.input, { height: 80 }]}
+          onChangeText={(text) => this.handleTextChange('description', text)}
+          value={this.state.description}
+        />
 
         <Button handleAddButton={this.handleAddButton} color={'#183661'} text={'Add'} />
 
@@ -76,11 +89,3 @@ export default class App extends Component {
     );
   }
 }
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    backgroundColor: '#38598b',
-  }
-});
