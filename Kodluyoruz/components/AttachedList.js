@@ -3,6 +3,7 @@ import { Text, FlatList, StyleSheet, Dimensions, View } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from '../styles/attachedListStyle'
 const { width } = Dimensions.get('window');
+import { TouchableOpacity } from 'react-native'
 
 
 class AttachedList extends Component {
@@ -15,13 +16,16 @@ class AttachedList extends Component {
                 renderItem={({ item }) =>
                     <View style={styles.attachedBox}>
                         <View style={styles.firstRow}>
+
                             <Icon style={styles.quoteLeftIcon} name="quote-left" size={12} color={'white'} />
                             <Text style={styles.title}>
                                 {item.title}
                             </Text>
                             <Icon style={styles.quoteRightIcon} name="quote-right" size={12} color={'white'} />
 
-                            <Icon style={styles.trashIcon} name="trash" size={16} color={'white'} />
+                            <TouchableOpacity onPress={() => this.props.deleteNote(item.id)} activeOpacity={0.7}>
+                                <Icon style={styles.trashIcon} name="trash" size={16} color={'white'} />
+                            </TouchableOpacity>
                         </View>
 
                         <View style={{
@@ -52,8 +56,5 @@ class AttachedList extends Component {
         )
     }
 }
-<Icon name="trash" size={20} color={'white'} />
-
-
 
 export default AttachedList;

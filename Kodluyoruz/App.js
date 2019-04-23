@@ -18,6 +18,8 @@ export default class App extends Component {
     //response comes back as promise from local storage.
     const response = this._retrieveData();
     response.then((data) => {
+      console.log(data);
+      console.log('cmd');
       this.setState({ attachedList: data });
     });
   }
@@ -27,7 +29,7 @@ export default class App extends Component {
     try {
       strData = JSON.stringify(data);
 
-      await AsyncStorage.setItem('za11', strData);
+      await AsyncStorage.setItem('localDb', strData);
     }
     catch (error) {
       console.log(error.message);
@@ -38,7 +40,7 @@ export default class App extends Component {
   _retrieveData = async () => {
     let response;
     try {
-      response = await AsyncStorage.getItem('za11') || 'none';
+      response = await AsyncStorage.getItem('localDb') || 'none';
     }
     catch (error) {
       console.log(error.message);
@@ -52,12 +54,37 @@ export default class App extends Component {
 
   handleAddButton = async () => {
     attachedList = [...this.state.attachedList, { 'title': this.state.title, 'description': this.state.description }];
+    attachedList.map((attachedNote, index) => {
+      attachedNote.id = index;
+    });
+
     await this.setState({
       title: '',
       description: '',
       attachedList
     });
     this._storeData(attachedList);
+  }
+
+  deleteNote = (id) => {
+    try {
+
+      // this.state.attachedList = this.state.attachedList.filter((attachedNote) => attachedNote.id !== id);
+      // this.forceUpdate();
+      console.log(this.state.attachedList);
+
+      const response = this._retrieveData();
+
+      response.then((data) => {
+        newData = data.filter((attachedNote) => attachedNote.id !== id);
+        this._storeData(newData);
+        this.setState({ attachedList: newData });
+
+      });
+    }
+    catch (error) {
+      console.log(error.message);
+    }
   }
 
   render() {
@@ -84,7 +111,7 @@ export default class App extends Component {
 
         <Button handleAddButton={this.handleAddButton} color={'#183661'} text={'Add'} />
 
-        <AttachedList attachedList={this.state.attachedList} />
+        <AttachedList deleteNote={this.deleteNote} attachedList={this.state.attachedList} />
       </SafeAreaView >
     );
   }
