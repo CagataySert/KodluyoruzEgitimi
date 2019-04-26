@@ -34,8 +34,11 @@ export default StyleSheet.create({
         fontSize: 16
     },
     trashIcon: {
-        marginRight: 10,
-        marginLeft: 10
+        marginLeft: 10,
+        marginRight: 5
+    },
+    editIcon: {
+        marginRight: 10
     },
     secondRow: {
         flexDirection: 'row',
@@ -50,5 +53,17 @@ export default StyleSheet.create({
         marginLeft: 5,
         color: 'white',
         fontSize: 12
+    },
+    lineHolder: {
+        width: width * 0.9,
+        alignItems: 'center',
+        marginBottom: 10,
+        marginTop: 10
+    },
+    line: {
+        borderColor: '#a2a8d3',
+        borderWidth: 0.5,
+        width: 150,
+        alignItems: 'center'
     }
 })

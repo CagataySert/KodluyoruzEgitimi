@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Text, FlatList, StyleSheet, Dimensions, View } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from '../styles/attachedListStyle'
-const { width } = Dimensions.get('window');
 import { TouchableOpacity } from 'react-native'
 
 
@@ -26,21 +25,13 @@ class AttachedList extends Component {
                             <TouchableOpacity onPress={() => this.props.deleteNote(item.id)} activeOpacity={0.7}>
                                 <Icon style={styles.trashIcon} name="trash" size={16} color={'white'} />
                             </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.props.getNoteToBeUpdated(item.id)} activeOpacity={0.7}>
+                                <Icon style={styles.editIcon} name="edit" size={16} color={'white'} />
+                            </TouchableOpacity>
                         </View>
 
-                        <View style={{
-                            width: width * 0.9,
-                            alignItems: 'center',
-                            marginBottom: 10,
-                            marginTop: 10
-                        }}>
-                            <View style={{
-                                borderColor: '#a2a8d3',
-                                borderWidth: 0.5,
-                                width: 150,
-                                alignItems: 'center'
-                            }}>
-                            </View>
+                        <View style={styles.lineHolder}>
+                            <View style={styles.line} />
                         </View>
 
 

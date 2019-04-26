@@ -3,84 +3,109 @@ import { View, Text, TextInput, SafeAreaView } from 'react-native';
 import Header from './components/Header';
 import Button from './components/Button';
 import AttachedList from './components/AttachedList';
-import { AsyncStorage } from 'react-native';
 import styles from './styles/formStyle';
+import _retrieveData from './components/RetrieveData';
+import _storeData from './components/StoreData';
 
 export default class App extends Component {
 
   state = {
     title: '',
     description: '',
+    isUpdate: false,
+    idOfUpdatedValue: -1,
     attachedList: []
   }
 
   componentDidMount() {
     //response comes back as promise from local storage.
-    const response = this._retrieveData();
+    const response = _retrieveData();
     response.then((data) => {
-      console.log(data);
-      console.log('cmd');
       this.setState({ attachedList: data });
     });
   }
 
-  //Store data to Local of phone.
-  _storeData = async (data) => {
-    try {
-      strData = JSON.stringify(data);
 
-      await AsyncStorage.setItem('localDb', strData);
-    }
-    catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  //Retrieve data from the local storage.
-  _retrieveData = async () => {
-    let response;
-    try {
-      response = await AsyncStorage.getItem('localDb') || 'none';
-    }
-    catch (error) {
-      console.log(error.message);
-    }
-    return JSON.parse(response);
-  };
 
   handleTextChange = (type, value) => {
     type === 'title' ? this.setState({ title: value }) : this.setState({ description: value });
   }
 
   handleAddButton = async () => {
-    attachedList = [...this.state.attachedList, { 'title': this.state.title, 'description': this.state.description }];
-    attachedList.map((attachedNote, index) => {
-      attachedNote.id = index;
-    });
+    //Update Section
+    if (this.state.isUpdate === true) {
+      this.updateNote(this.state.idOfUpdatedValue, this.state.title, this.state.description);
+    }
 
-    await this.setState({
-      title: '',
-      description: '',
-      attachedList
-    });
-    this._storeData(attachedList);
+    else {
+      //Add Section
+      attachedList = [...this.state.attachedList, { 'title': this.state.title, 'description': this.state.description }];
+      attachedList.map((attachedNote, index) => {
+        attachedNote.id = index;
+      });
+
+      await this.setState({
+        title: '',
+        description: '',
+        attachedList
+      });
+      _storeData(attachedList);
+    }
   }
 
+
+  //Delete Process
   deleteNote = (id) => {
     try {
-
-      // this.state.attachedList = this.state.attachedList.filter((attachedNote) => attachedNote.id !== id);
-      // this.forceUpdate();
       console.log(this.state.attachedList);
 
-      const response = this._retrieveData();
+      const response = _retrieveData();
 
       response.then((data) => {
-        newData = data.filter((attachedNote) => attachedNote.id !== id);
-        this._storeData(newData);
+        const newData = data.filter((attachedNote) => attachedNote.id !== id);
+        _storeData(newData);
         this.setState({ attachedList: newData });
-
       });
+    }
+    catch (error) {
+      console.log(error.message);
+    }
+  }
+
+
+  //Update Process
+  getNoteToBeUpdated = (id) => {
+    const response = _retrieveData();
+    response.then((data) => {
+      const noteToBeUpdated = data.filter((attachedNote) => attachedNote.id === id);
+      this.setState({
+        title: noteToBeUpdated[0].title,
+        description: noteToBeUpdated[0].description,
+        isUpdate: true,
+        idOfUpdatedValue: id
+      });
+    });
+  }
+
+  updateNote = (id, newTitle, newDescription) => {
+    try {
+      const response = _retrieveData();
+      response.then((data) => {
+        const attachedNote = data.filter((attachedNote) => attachedNote.id === id);
+        console.log(attachedNote);
+        attachedNote[0].title = newTitle;
+        attachedNote[0].description = newDescription;
+
+        this.setState({
+          title: '',
+          description: '',
+          idOfUpdatedValue: -1,
+          attachedList: data,
+          isUpdate: false
+        });
+
+        _storeData(data);
+      })
     }
     catch (error) {
       console.log(error.message);
@@ -111,7 +136,7 @@ export default class App extends Component {
 
         <Button handleAddButton={this.handleAddButton} color={'#183661'} text={'Add'} />
 
-        <AttachedList deleteNote={this.deleteNote} attachedList={this.state.attachedList} />
+        <AttachedList getNoteToBeUpdated={this.getNoteToBeUpdated} deleteNote={this.deleteNote} attachedList={this.state.attachedList} />
       </SafeAreaView >
     );
   }
