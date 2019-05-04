@@ -3,7 +3,8 @@ import { Text, View, TextInput, TouchableOpacity } from 'react-native'
 import styles from '../styles/formStyle';
 import _storeData from './StoreData';
 import _retrieveData from './RetrieveData';
-import { Actions } from 'react-native-router-flux';
+import { addNewNote } from '../actions/ToDoListActions';
+import { connect } from 'react-redux';
 
 class Form extends Component {
     state = {
@@ -11,16 +12,8 @@ class Form extends Component {
         description: "",
         isUpdate: false,
         idOfUpdatedValue: -1,
-        attachedList: []
+        attachedList: this.props.data
     };
-
-    componentDidMount() {
-        //response comes back as promise from local storage.
-        const response = _retrieveData();
-        response.then(data => {
-            this.setState({ attachedList: data });
-        });
-    }
 
     handleTextChange = (type, value) => {
         type === "title"
@@ -34,16 +27,16 @@ class Form extends Component {
             ...this.state.attachedList,
             { title: this.state.title, description: this.state.description }
         ];
-        attachedList.map((attachedNote, index) => {
+        await attachedList.map((attachedNote, index) => {
             attachedNote.id = index;
         });
 
-        await this.setState({
+        this.setState({
             title: "",
             description: "",
             attachedList
         });
-        _storeData(attachedList);
+        this.props.addNewNote(attachedList);
     };
 
     render() {
@@ -80,5 +73,7 @@ class Form extends Component {
         )
     }
 }
-
-export default Form;
+const mapStateToProps = ({ toDoListResponse }) => {
+    return { data: toDoListResponse.data[0] };
+}
+export default connect(mapStateToProps, { addNewNote })(Form);

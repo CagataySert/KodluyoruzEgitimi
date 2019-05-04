@@ -6,6 +6,8 @@ import { TouchableOpacity } from "react-native";
 import _retrieveData from './RetrieveData';
 import _storeData from './StoreData';
 import { Actions } from 'react-native-router-flux';
+import { connect } from "react-redux";
+import { getToDoList, deleteNote } from '../actions/ToDoListActions';
 
 const { width } = Dimensions.get('window');
 
@@ -16,28 +18,12 @@ class AttachedList extends Component {
   }
 
   componentDidMount() {
-    //response comes back as promise from local storage.
-    const response = _retrieveData();
-    response.then(data => {
-      this.setState({ attachedList: data });
-    });
+    this.props.getToDoList();
   }
 
   //Delete Process
   deleteNote = id => {
-    try {
-      console.log(this.state.attachedList);
-
-      const response = _retrieveData();
-
-      response.then(data => {
-        const newData = data.filter(attachedNote => attachedNote.id !== id);
-        _storeData(newData);
-        this.setState({ attachedList: newData });
-      });
-    } catch (error) {
-      console.log(error.message);
-    }
+    this.props.deleteNote(id);
   };
 
 
@@ -55,7 +41,7 @@ class AttachedList extends Component {
 
         <FlatList
           contentContainerStyle={{ alignItems: "center" }}
-          data={this.state.attachedList}
+          data={this.props.data[0]}
           renderItem={({ item }) => (
             <View style={styles.attachedBox}>
               <View style={styles.firstRow}>
@@ -108,4 +94,9 @@ class AttachedList extends Component {
   }
 }
 
-export default AttachedList;
+const mapStateToProps = ({ toDoListResponse }) => {
+  _storeData(toDoListResponse.data[0]);
+  return { data: toDoListResponse.data };
+}
+
+export default connect(mapStateToProps, { getToDoList, deleteNote })(AttachedList);
