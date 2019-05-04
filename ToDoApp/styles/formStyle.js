@@ -15,5 +15,13 @@ export default StyleSheet.create({
     borderColor: 'white',
     borderWidth: 1,
     backgroundColor: '#a2a8d3'
+  },
+  button: {
+    width: width * 0.5,
+    marginTop: 10,
+    backgroundColor: '#183661',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 20
   }
 });

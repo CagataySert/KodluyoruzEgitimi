@@ -1,73 +1,109 @@
 import React, { Component } from "react";
-import { Text, FlatList, StyleSheet, Dimensions, View } from "react-native";
+import { Text, FlatList, View, Dimensions } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import styles from "../styles/attachedListStyle";
 import { TouchableOpacity } from "react-native";
+import _retrieveData from './RetrieveData';
+import _storeData from './StoreData';
+import { Actions } from 'react-native-router-flux';
+
+const { width } = Dimensions.get('window');
 
 class AttachedList extends Component {
+
+  state = {
+    attachedList: []
+  }
+
+  componentDidMount() {
+    //response comes back as promise from local storage.
+    const response = _retrieveData();
+    response.then(data => {
+      this.setState({ attachedList: data });
+    });
+  }
+
+  //Delete Process
+  deleteNote = id => {
+    try {
+      console.log(this.state.attachedList);
+
+      const response = _retrieveData();
+
+      response.then(data => {
+        const newData = data.filter(attachedNote => attachedNote.id !== id);
+        _storeData(newData);
+        this.setState({ attachedList: newData });
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+
   render() {
     return (
-      <FlatList
-        contentContainerStyle={{ alignItems: "center" }}
-        data={this.props.attachedList}
-        renderItem={({ item }) => (
-          <View style={styles.attachedBox}>
-            <View style={styles.firstRow}>
-              <Icon
-                style={styles.quoteLeftIcon}
-                name="quote-left"
-                size={12}
-                color={"white"}
-              />
-              <Text style={styles.title}>{item.title}</Text>
-              <Icon
-                style={styles.quoteRightIcon}
-                name="quote-right"
-                size={12}
-                color={"white"}
-              />
+      <View style={{ marginBottom: 60 }}>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text
+            style={{ marginTop: 20, padding: 10, backgroundColor: '#183661', color: 'white', width: width * 0.4, borderRadius: 20 }}
+            onPress={() => Actions.addingForm({ type: 'push' })}
+          >
+            Add New Note
+          </Text>
+        </View>
 
-              <TouchableOpacity
-                onPress={() => this.props.deleteNote(item.id)}
-                activeOpacity={0.7}
-              >
+        <FlatList
+          contentContainerStyle={{ alignItems: "center" }}
+          data={this.state.attachedList}
+          renderItem={({ item }) => (
+            <View style={styles.attachedBox}>
+              <View style={styles.firstRow}>
                 <Icon
-                  style={styles.trashIcon}
-                  name="trash"
-                  size={16}
+                  style={styles.quoteLeftIcon}
+                  name="quote-left"
+                  size={12}
                   color={"white"}
                 />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => this.props.getNoteToBeUpdated(item.id)}
-                activeOpacity={0.7}
-              >
+                <Text style={styles.title}>{item.title}</Text>
                 <Icon
-                  style={styles.editIcon}
-                  name="edit"
-                  size={16}
+                  style={styles.quoteRightIcon}
+                  name="quote-right"
+                  size={12}
                   color={"white"}
                 />
-              </TouchableOpacity>
-            </View>
 
-            <View style={styles.lineHolder}>
-              <View style={styles.line} />
-            </View>
+                <TouchableOpacity
+                  onPress={() => this.deleteNote(item.id)}
+                  activeOpacity={0.7}
+                >
+                  <Icon
+                    style={styles.trashIcon}
+                    name="trash"
+                    size={16}
+                    color={"white"}
+                  />
+                </TouchableOpacity>
+              </View>
 
-            <View style={styles.secondRow}>
-              <Icon
-                style={styles.arrowIcon}
-                name="arrow-right"
-                size={10}
-                color={"white"}
-              />
-              <Text style={styles.description}>{item.description}</Text>
+              <View style={styles.lineHolder}>
+                <View style={styles.line} />
+              </View>
+
+              <View style={styles.secondRow}>
+                <Icon
+                  style={styles.arrowIcon}
+                  name="arrow-right"
+                  size={10}
+                  color={"white"}
+                />
+                <Text style={styles.description}>{item.description}</Text>
+              </View>
             </View>
-          </View>
-        )}
-        style={styles.attachedListRegion}
-      />
+          )}
+          style={styles.attachedListRegion}
+        />
+      </View>
     );
   }
 }
